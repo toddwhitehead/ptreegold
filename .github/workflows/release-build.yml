@@ -8,6 +8,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        runtime: [linux-x64, win-x64, osx-x64]
     permissions:
       contents: read
     steps:
@@ -22,5 +26,52 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore PTreeGold.csproj
 
-      - name: Build project
-        run: dotnet build PTreeGold.csproj --configuration Release --no-restore
+      - name: Publish binary
+        run: >
+          dotnet publish PTreeGold.csproj
+          --configuration Release
+          --runtime ${{ matrix.runtime }}
+          --self-contained true
+          /p:PublishSingleFile=true
+          /p:IncludeNativeLibrariesForSelfExtract=true
+          --output publish/${{ matrix.runtime }}
+
+      - name: Archive publish output (Windows)
+        if: startsWith(matrix.runtime, 'win-')
+        run: |
+          cd publish
+          zip -r ../ptg-${{ github.ref_name }}-${{ matrix.runtime }}.zip ${{ matrix.runtime }}
+
+      - name: Archive publish output (Unix)
+        if: !startsWith(matrix.runtime, 'win-')
+        run: |
+          cd publish
+          tar -czf ../ptg-${{ github.ref_name }}-${{ matrix.runtime }}.tar.gz ${{ matrix.runtime }}
+
+      - name: Upload packaged binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ptg-${{ matrix.runtime }}
+          path: |
+            ptg-${{ github.ref_name }}-${{ matrix.runtime }}.zip
+            ptg-${{ github.ref_name }}-${{ matrix.runtime }}.tar.gz
+          if-no-files-found: ignore
+
+  publish-release:
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download packaged artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: ptg-*
+          path: dist
+          merge-multiple: true
+
+      - name: Upload assets to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
