@@ -47,6 +47,54 @@ PTREE Gold borrows that same philosophy for password management:
 
 ---
 
+## Download & Install
+
+Pre-built self-contained binaries are published for every release on the [Releases page](https://github.com/toddwhitehead/ptreegold/releases). No .NET SDK required to run them.
+
+### Windows (x64)
+
+1. Download `ptg-vX.Y.Z-win-x64.zip` from the [latest release](https://github.com/toddwhitehead/ptreegold/releases/latest).
+2. Extract the archive (right-click → **Extract All**, or `Expand-Archive` in PowerShell):
+   ```powershell
+   Expand-Archive ptg-vX.Y.Z-win-x64.zip -DestinationPath ptg
+   ```
+3. Enter the extracted folder and run:
+   ```powershell
+   cd ptg
+   .\ptg.exe
+   ```
+
+### macOS (x64)
+
+1. Download `ptg-vX.Y.Z-osx-x64.tar.gz` from the [latest release](https://github.com/toddwhitehead/ptreegold/releases/latest).
+2. Extract the archive and make the binary executable:
+   ```bash
+   tar -xzf ptg-vX.Y.Z-osx-x64.tar.gz
+   cd ptg
+   chmod +x ptg
+   ```
+3. Run the app:
+   ```bash
+   ./ptg
+   ```
+   > **Note:** macOS may show a Gatekeeper warning the first time. To allow it, open **System Settings → Privacy & Security** and click **Allow Anyway**, or run `xattr -c ./ptg` before launching.
+
+### Linux (x64)
+
+1. Download `ptg-vX.Y.Z-linux-x64.tar.gz` from the [latest release](https://github.com/toddwhitehead/ptreegold/releases/latest).
+2. Extract the archive and make the binary executable:
+   ```bash
+   tar -xzf ptg-vX.Y.Z-linux-x64.tar.gz
+   cd ptg
+   chmod +x ptg
+   ```
+3. Run the app:
+   ```bash
+   ./ptg
+   ```
+
+---
+
 ## Running It
 
 ```powershell
