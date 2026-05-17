@@ -43,7 +43,7 @@ jobs:
           zip -r ../ptg-${{ github.ref_name }}-${{ matrix.runtime }}.zip ${{ matrix.runtime }}
 
       - name: Archive publish output (Unix)
-        if: ${{ !startsWith(matrix.runtime, 'win-') }}
+        if: !startsWith(matrix.runtime, 'win-')
         run: |
           cd publish
           tar -czf ../ptg-${{ github.ref_name }}-${{ matrix.runtime }}.tar.gz ${{ matrix.runtime }}
@@ -67,6 +67,7 @@ jobs:
       - name: Download packaged artifacts
         uses: actions/download-artifact@v4
         with:
+          pattern: ptg-*
           path: dist
           merge-multiple: true
 
