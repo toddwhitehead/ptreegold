@@ -1,14 +1,21 @@
-﻿using PwdGen.Services;
-using PwdGen.UI;
+﻿using Terminal.Gui;
+using PTreeGold.Services;
+using PTreeGold.UI;
 
 var configService = new ConfigService();
 var settings = configService.Load();
 
-var generator = new PasswordGenerator();
-var entropy = new EntropyCalculator();
-var export = new ExportService();
+var generator  = new PasswordGenerator();
+var entropy    = new EntropyCalculator();
+var export     = new ExportService();
 
-var generateFlow = new GenerateFlow(generator, entropy, export, settings.Patterns);
-var menu = new MainMenu(generateFlow, settings.Patterns);
-
-await menu.RunAsync();
+Application.Init();
+try
+{
+    var win = new MainWindow(settings.Patterns, generator, entropy, export);
+    Application.Run(win);
+}
+finally
+{
+    Application.Shutdown();
+}

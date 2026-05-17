@@ -8,7 +8,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "C:\\projects\\tools-pwdgen\\PwdGen.csproj",
-        "projectName": "PwdGen",
+        "projectName": "ptg",
         "projectPath": "C:\\projects\\tools-pwdgen\\PwdGen.csproj",
         "packagesPath": "C:\\Users\\toddt\\.nuget\\packages\\",
         "outputPath": "C:\\projects\\tools-pwdgen\\obj\\",
@@ -58,9 +58,9 @@
               "target": "Package",
               "version": "[10.0.8, )"
             },
-            "Spectre.Console": {
+            "Terminal.Gui": {
               "target": "Package",
-              "version": "[0.55.2, )"
+              "version": "[2.0.0, )"
             },
             "TextCopy": {
               "target": "Package",

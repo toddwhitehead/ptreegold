@@ -1,0 +1,200 @@
+# 🌲 PTREE Gold — `ptg`
+
+> *Passwords for the cloud age, with added retro happiness.*
+
+A terminal-based password generator built with [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui), inspired by the legendary **XTree Gold** file manager. If you spent time navigating directories in the early 90s with those crisp blue panels and snappy keyboard shortcuts — this one's for you.
+
+---
+
+## Screenshots
+
+<!-- Main window screenshot -->
+![Main window](_screenshots/main-window.png)
+
+<!-- Generate dialog screenshot -->
+![Generate dialog](_screenshots/generate-dialog.png)
+
+<!-- Export dialog screenshot -->
+![Export dialog](_screenshots/export-dialog.png)
+
+---
+
+## What It Does
+
+**PTREE Gold** generates cryptographically strong passwords tailored for specific cloud and on-premises services. Every password is generated using `System.Security.Cryptography.RandomNumberGenerator` — no `System.Random`, ever.
+
+Key features:
+
+- **Named patterns** — pre-built profiles for common Azure and Windows services (SQL Server, Entra ID, Azure SQL, MySQL, PostgreSQL, AKS, App Service, APIM, VM admins, and more)
+- **Custom patterns** — build a one-off pattern on the fly without touching any config file
+- **Entropy display** — every generated password shows its bit-strength and a label (Weak / Fair / Strong / Very Strong / Excellent)
+- **Batch generation** — generate 1–50 passwords in one shot
+- **Copy to clipboard** — hit `F3` to copy the selected password instantly
+- **Export to file** — save the current batch to a plain-text file with `F5`
+- **Ambiguous character exclusion** — optionally strip `0`, `O`, `l`, `1`, `I` from the pool so passwords survive being read aloud or typed off a screen
+
+---
+
+## XTree Gold Inspiration
+
+XTree Gold (1991, Executive Systems Inc.) was a DOS file manager that made navigating a hard drive *feel good*. The secret was its design philosophy: a minimal, keyboard-driven interface where every action had a single key, panels were always visible, and you always knew exactly where you were.
+
+PTREE Gold borrows that same philosophy for password management:
+
+| XTree Gold idea | PTREE Gold equivalent |
+|---|---|
+| Left panel = directory tree | Left panel = named pattern list |
+| Right panel = file list | Right panel = generated passwords |
+| Single-key actions on status bar | `F2` Generate · `F3` Copy · `F5` Export · `F10` Quit |
+| Highlight + Enter to open | Highlight pattern + `Enter` or `F2` to generate |
+| Everything keyboard-first | Mouse works too, but you won't need it |
+
+---
+
+## Running It
+
+```powershell
+cd bin\Debug\net9.0
+.\ptg.exe
+```
+
+Or build and run from the project root:
+
+```powershell
+dotnet run
+```
+
+**Keyboard shortcuts:**
+
+| Key | Action |
+|-----|--------|
+| `↑` / `↓` | Navigate the pattern list |
+| `Enter` or `F2` | Open the Generate dialog for the selected pattern |
+| `F3` | Copy the highlighted password to clipboard |
+| `F5` | Export the current batch to a file |
+| `F10` | Quit |
+
+---
+
+## How Patterns Work
+
+Patterns are stored as named entries in `appsettings.json` under the `"patterns"` key. Each pattern is a JSON object describing the rules the generator must satisfy:
+
+```json
+{
+  "patterns": {
+    "my-pattern": {
+      "description": "Human-readable label shown in the UI",
+      "minLength": 16,
+      "maxLength": 24,
+      "useUppercase": true,
+      "useLowercase": true,
+      "useDigits": true,
+      "useSymbols": true,
+      "symbolSet": "!@#$%^&*-_+=",
+      "excludeAmbiguous": true,
+      "minUppercase": 2,
+      "minLowercase": 2,
+      "minDigits": 2,
+      "minSymbols": 1
+    }
+  }
+}
+```
+
+### Field Reference
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `description` | string | Shown in the **Generator Settings** panel |
+| `minLength` / `maxLength` | int | Final password length is chosen randomly in this range |
+| `useUppercase` / `useLowercase` / `useDigits` / `useSymbols` | bool | Which character classes are included in the pool |
+| `symbolSet` | string | Exact symbol characters to use (leave empty for default `!@#$%^&*-_+=`) |
+| `excludeAmbiguous` | bool | Strip `0 O l 1 I` from all pools |
+| `minUppercase` / `minLowercase` / `minDigits` / `minSymbols` | int | Guaranteed minimums — the generator always satisfies these before filling the rest randomly |
+
+The generator picks required characters from each class first, then fills the remaining slots from the combined pool, then **cryptographically shuffles** the whole result — so the required characters never appear in predictable positions.
+
+### Adding a New Pattern
+
+1. Open `appsettings.json` in the project root.
+2. Add a new key inside `"patterns"`. The key becomes the name shown in the left panel.
+3. Fill in the fields — copy an existing pattern as a starting point.
+4. Save and restart `ptg.exe`. Your pattern appears in the list immediately.
+
+**Example — a pattern for a local Wi-Fi router admin page:**
+
+```json
+"home-router": {
+  "description": "Home router admin (no special chars, long)",
+  "minLength": 20,
+  "maxLength": 28,
+  "useUppercase": true,
+  "useLowercase": true,
+  "useDigits": true,
+  "useSymbols": false,
+  "symbolSet": "",
+  "excludeAmbiguous": true,
+  "minUppercase": 2,
+  "minLowercase": 4,
+  "minDigits": 2,
+  "minSymbols": 0
+}
+```
+
+No recompile needed — `appsettings.json` is copied to the output directory on every build and read at startup.
+
+---
+
+## Built-in Patterns
+
+| Pattern key | Target service |
+|-------------|---------------|
+| `sqlserver` | On-premises SQL Server login |
+| `entraid` | Microsoft Entra ID / Azure AD user account |
+| `service-account` | Windows / Active Directory service account |
+| `azure-sql` | Azure SQL Database admin login |
+| `azure-mysql` | Azure Database for MySQL Flexible Server |
+| `azure-postgres` | Azure Database for PostgreSQL Flexible Server |
+| `azure-vm-admin` | Azure VM Windows local administrator |
+| `azure-aks-admin` | Azure Kubernetes Service Windows node admin |
+| `azure-appsvc-deploy` | Azure App Service FTP / deployment credentials |
+| `azure-apim` | Azure API Management publisher / admin account |
+
+---
+
+## Project Structure
+
+```
+ptg/
+├── appsettings.json        ← patterns live here
+├── Program.cs              ← entry point, wires services + launches UI
+├── Models/
+│   ├── AppSettings.cs      ← deserialization model
+│   └── PasswordPattern.cs  ← pattern definition
+├── Services/
+│   ├── ConfigService.cs    ← loads appsettings.json
+│   ├── PasswordGenerator.cs← crypto-random generation engine
+│   ├── EntropyCalculator.cs← bits of entropy + strength labels
+│   └── ExportService.cs    ← file export
+└── UI/
+    ├── MainWindow.cs       ← main layout (pattern list + password list)
+    ├── MainMenu.cs         ← menu bar definition
+    ├── GenerateDialog.cs   ← F2 generate modal
+    ├── GenerateFlow.cs     ← orchestrates generate + custom pattern flow
+    ├── DisplayHelpers.cs   ← formatting utilities
+    └── AppColorScheme.cs   ← retro colour palette
+```
+
+---
+
+## Requirements
+
+- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
+- Windows, macOS, or Linux terminal
+
+---
+
+## License
+
+See [LICENSE](LICENSE).

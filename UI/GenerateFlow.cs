@@ -1,12 +1,10 @@
-using Spectre.Console;
-using TextCopy;
-using PwdGen.Models;
-using PwdGen.Services;
+// Superseded by UI/GenerateDialog.cs.
+// This file is intentionally empty.
+namespace PTreeGold.UI;
 
-namespace PwdGen.UI;
-
-public class GenerateFlow
+internal static class GenerateFlow_Obsolete
 {
+#if false
     private readonly PasswordGenerator _generator;
     private readonly EntropyCalculator _entropy;
     private readonly ExportService _export;
@@ -208,4 +206,5 @@ public class GenerateFlow
             DisplayHelpers.ShowError(ex.Message);
         }
     }
+#endif
 }

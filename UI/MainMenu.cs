@@ -1,11 +1,10 @@
-using Spectre.Console;
-using PwdGen.Models;
-using PwdGen.Services;
+// Superseded by UI/MainWindow.cs.
+// This file is intentionally empty.
+namespace PTreeGold.UI;
 
-namespace PwdGen.UI;
-
-public class MainMenu
+internal static class MainMenu_Obsolete
 {
+#if false
     private readonly GenerateFlow _generateFlow;
     private readonly Dictionary<string, PasswordPattern> _patterns;
 
@@ -23,29 +22,29 @@ public class MainMenu
 
             string choice = AnsiConsole.Prompt(
                 new SelectionPrompt<string>()
-                    .Title("What would you like to do?")
+                    .Title("[bold gold1]Choose thy path:[/]")
                     .PageSize(6)
-                    .HighlightStyle(Style.Parse("cyan"))
+                    .HighlightStyle(Style.Parse("bold gold1"))
                     .AddChoices(
-                        "Generate Password",
-                        "List Named Patterns",
-                        "Quit"));
+                        "(G)enerate Password",
+                        "(L)ist Named Patterns",
+                        "(Q)uit"));
 
             switch (choice)
             {
-                case "Generate Password":
+                case "(G)enerate Password":
                     await _generateFlow.RunAsync();
                     Pause();
                     break;
 
-                case "List Named Patterns":
+                case "(L)ist Named Patterns":
                     DisplayHelpers.ShowBanner();
                     DisplayHelpers.ShowPatternsTable(_patterns);
                     Pause();
                     break;
 
-                case "Quit":
-                    AnsiConsole.MarkupLine("[grey]Goodbye.[/]");
+                case "(Q)uit":
+                    AnsiConsole.MarkupLine("[gold1]Fare thee well, brave soul.[/]");
                     return;
             }
         }
@@ -57,4 +56,5 @@ public class MainMenu
         AnsiConsole.MarkupLine("[grey]Press any key to return to the main menu...[/]");
         Console.ReadKey(intercept: true);
     }
+#endif
 }

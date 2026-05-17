@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
-using PwdGen.Models;
+using PTreeGold.Models;
 
-namespace PwdGen.Services;
+namespace PTreeGold.Services;
 
 public class ConfigService
 {

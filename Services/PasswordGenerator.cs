@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
-using PwdGen.Models;
+using PTreeGold.Models;
 
-namespace PwdGen.Services;
+namespace PTreeGold.Services;
 
 public class PasswordGenerator
 {

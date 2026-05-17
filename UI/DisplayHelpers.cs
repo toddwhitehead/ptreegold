@@ -1,17 +1,50 @@
-using Spectre.Console;
-using PwdGen.Models;
-using PwdGen.Services;
+// Superseded by UI/AppColorScheme.cs and Terminal.Gui views.
+// This file is intentionally empty.
+namespace PTreeGold.UI;
 
-namespace PwdGen.UI;
-
-public static class DisplayHelpers
+#pragma warning disable CS0219 // unused
+internal static class DisplayHelpers_Obsolete
 {
+#if false
     public static void ShowBanner()
     {
         if (AnsiConsole.Profile.Capabilities.Ansi)
             AnsiConsole.Clear();
-        AnsiConsole.Write(new FigletText("PwdGen").Color(Color.Cyan1));
-        AnsiConsole.Write(new Rule("[grey]Enterprise Secure Password Generator[/]").RuleStyle("grey").LeftJustified());
+
+        AnsiConsole.WriteLine();
+
+        // ── Title ───────────────────────────────────────────────────────────
+        var figlet = new FigletText("PwdGen")
+            .Centered()
+            .Color(Color.Gold1);
+
+        // ── Ankh (symbol of the Avatar / the passphrase bearer) ─────────────
+        var ankh = new Markup(
+            "\n" +
+            "[gold1]                                ___[/]\n" +
+            "[gold1]                               /   \\[/]\n" +
+            "[gold1]                              (     )[/]\n" +
+            "[gold1]                               \\   /[/]\n" +
+            "[gold1]                                \\_/[/]\n" +
+            "[gold1]                                 |[/]\n" +
+            "[gold1]                               --+--[/]\n" +
+            "[gold1]                                 |[/]\n");
+
+        // ── Tagline & footer ────────────────────────────────────────────────
+        var subtitle = new Markup(
+            "\n" +
+            "[bold yellow]                   ~~ Quest of the Passphrase ~~[/]\n" +
+            "[grey]                      Enterprise Password Forge[/]\n" +
+            "\n" +
+            "[grey dim]                   (C) 2026  Origin Passwords, Inc.[/]\n");
+
+        var panel = new Panel(new Rows(new IRenderable[] { figlet, ankh, subtitle }))
+            .Border(BoxBorder.Double)
+            .BorderColor(Color.Gold1)
+            .Padding(1, 0)
+            .Expand();
+
+        AnsiConsole.Write(panel);
         AnsiConsole.WriteLine();
     }
 
@@ -95,4 +128,5 @@ public static class DisplayHelpers
 
     public static void ShowSectionRule(string title) =>
         AnsiConsole.Write(new Rule($"[grey]{title}[/]").RuleStyle("grey").LeftJustified());
+#endif
 }

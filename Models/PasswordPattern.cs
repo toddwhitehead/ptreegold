@@ -1,4 +1,4 @@
-namespace PwdGen.Models;
+namespace PTreeGold.Models;
 
 public class PasswordPattern
 {
