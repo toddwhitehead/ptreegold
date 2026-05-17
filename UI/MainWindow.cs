@@ -58,6 +58,9 @@ public class MainWindow : Window
                     new MenuItem("_Copy Password",  "F3",  () => CopySelected(),             null!, null!, Key.F3),
                     new MenuItem("_Export to File", "F5",  () => OpenExportDialog(),         null!, null!, Key.F5),
                     null!,
+                    new MenuItem("-_Count",          "F6",  () => AdjustCount(-1),            null!, null!, Key.F6),
+                    new MenuItem("+_Count",          "F7",  () => AdjustCount(+1),            null!, null!, Key.F7),
+                    null!,
                     new MenuItem("_Quit",           "F10", () => Application.RequestStop(), null!, null!, Key.F10),
                 }, null!),
             },
@@ -217,6 +220,8 @@ public class MainWindow : Window
         statusBar.Add(new Shortcut(Key.F2,  "~F2~ Generate", () => OpenGenerateDialog(),       ""));
         statusBar.Add(new Shortcut(Key.F3,  "~F3~ Copy",     () => CopySelected(),             ""));
         statusBar.Add(new Shortcut(Key.F5,  "~F5~ Export",   () => OpenExportDialog(),         ""));
+        statusBar.Add(new Shortcut(Key.F6,  "~F6~ -Count",   () => AdjustCount(-1),            ""));
+        statusBar.Add(new Shortcut(Key.F7,  "~F7~ +Count",   () => AdjustCount(+1),            ""));
         statusBar.Add(new Shortcut(Key.F10, "~F10~ Quit",     () => Application.RequestStop(), ""));
 
         Add(menuBar, leftFrame, rightFrame, settingsFrame, statusBar);
@@ -268,6 +273,13 @@ public class MainWindow : Window
     }
 
     // ── Helpers ───────────────────────────────────────────────────
+
+    private void AdjustCount(int delta)
+    {
+        if (!int.TryParse(_countField.Text?.ToString(), out int current))
+            current = 5;
+        _countField.Text = Math.Clamp(current + delta, 1, 50).ToString();
+    }
 
     private static string WrapValue(string fieldLabel, string value, int labelWidth)
     {
@@ -346,14 +358,16 @@ public class MainWindow : Window
     {
         if (_passwords.Count == 0) return;
 
+        int maxPwLen = _passwords.Max(pw => pw.Length);
+
         var display = _passwords
             .Select((pw, i) =>
             {
                 var r = _activePattern != null
                     ? _entropyCalc.Calculate(pw, _activePattern)
                     : null;
-                var entropy = r != null ? $"  {r.Bits:F0}b ({r.Label})" : "";
-                return $" {i + 1,2}.  {pw}   {pw.Length}ch{entropy}";
+                var entropy = r != null ? $"  {r.Bits,3:F0}b  ({r.Label,-11})" : "";
+                return $" {i + 1,2}.  {pw.PadRight(maxPwLen)}  {pw.Length,2}ch{entropy}";
             })
             .ToList();
 

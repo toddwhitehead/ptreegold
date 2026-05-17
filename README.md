@@ -1,29 +1,11 @@
 # 🌲 PTREE Gold — `ptg`
 
 > *Passwords for the cloud age, with added retro happiness.*
+**PTREE Gold** generates cryptographically strong passwords tailored for specific cloud and on-premises services. With a fast terminal-based UI inspired by the legendary DOS utilities of the 80's and 90's. No more blindly trusting random websites to geenerate secure passwords that match the pattern you need. PTree Gold does it all locally, securely and with retro charm.
 
-A terminal-based password generator built with [Terminal.Gui](https://github.com/gui-cs/Terminal.Gui), inspired by the legendary **XTree Gold** file manager. If you spent time navigating directories in the early 90s with those crisp blue panels and snappy keyboard shortcuts — this one's for you.
+![Generated passwords](docs/passwords-generated.png)
 
----
-
-## Screenshots
-
-<!-- Main window screenshot -->
-![Main window](_screenshots/main-window.png)
-
-<!-- Generate dialog screenshot -->
-![Generate dialog](_screenshots/generate-dialog.png)
-
-<!-- Export dialog screenshot -->
-![Export dialog](_screenshots/export-dialog.png)
-
----
-
-## What It Does
-
-**PTREE Gold** generates cryptographically strong passwords tailored for specific cloud and on-premises services. Every password is generated using `System.Security.Cryptography.RandomNumberGenerator` — no `System.Random`, ever.
-
-Key features:
+## Key features:
 
 - **Named patterns** — pre-built profiles for common Azure and Windows services (SQL Server, Entra ID, Azure SQL, MySQL, PostgreSQL, AKS, App Service, APIM, VM admins, and more)
 - **Custom patterns** — build a one-off pattern on the fly without touching any config file
@@ -33,28 +15,41 @@ Key features:
 - **Export to file** — save the current batch to a plain-text file with `F5`
 - **Ambiguous character exclusion** — optionally strip `0`, `O`, `l`, `1`, `I` from the pool so passwords survive being read aloud or typed off a screen
 
----
+## Retro Inspiration
 
-## XTree Gold Inspiration
-
-XTree Gold (1991, Executive Systems Inc.) was a DOS file manager that made navigating a hard drive *feel good*. The secret was its design philosophy: a minimal, keyboard-driven interface where every action had a single key, panels were always visible, and you always knew exactly where you were.
+Long before Windows and GUI's were a thing, Text User Interfaces ruled the earth. Utilities like XTree Gold (1991, Executive Systems Inc.) and Norton Commander perfected the art of text based based tools that made navigating a hard drive *feel good*. The secret was its design philosophy: a minimal, keyboard-driven interface where every action had a single key, panels were always visible, and you always knew exactly where you were.
 
 PTREE Gold borrows that same philosophy for password management:
 
-| XTree Gold idea | PTREE Gold equivalent |
-|---|---|
-| Left panel = directory tree | Left panel = named pattern list |
-| Right panel = file list | Right panel = generated passwords |
-| Single-key actions on status bar | `F2` Generate · `F3` Copy · `F5` Export · `F10` Quit |
-| Highlight + Enter to open | Highlight pattern + `Enter` or `F2` to generate |
-| Everything keyboard-first | Mouse works too, but you won't need it |
+---
+
+## Screenshots
+
+**Startup — pattern list on the left, empty password panel on the right:**
+
+![Main screen](docs/main-screen.png)
+
+**Select a pattern to see its rules in the Generator Settings panel:**
+
+![Pattern details](docs/password-pattern.png)
+
+**Press `Enter` or `F2` to generate — passwords with length and entropy score appear instantly:**
+
+![Generated passwords](docs/passwords-generated.png)
+
+**Press `F5` to export the batch — the file path is pre-filled and editable:**
+
+![Export dialog](docs/export-passwords.png)
+
+**Select `── Custom ──` and press `F2` to build a one-off pattern on the fly:**
+
+![Custom pattern dialog](docs/custum-pattern.png)
 
 ---
 
 ## Running It
 
 ```powershell
-cd bin\Debug\net9.0
 .\ptg.exe
 ```
 
@@ -72,6 +67,8 @@ dotnet run
 | `Enter` or `F2` | Open the Generate dialog for the selected pattern |
 | `F3` | Copy the highlighted password to clipboard |
 | `F5` | Export the current batch to a file |
+| `F6` / `F7` | Decrease / increase password count by 1 |
+| `Tab` / `Shift+Tab` | Cycle focus between panels |
 | `F10` | Quit |
 
 ---
