@@ -1,0 +1,22 @@
+PackageIdentifier: ToddWhitehead.PTG
+PackageVersion: 1.0.1
+PackageLocale: en-US
+Publisher: Todd Whitehead
+PublisherUrl: https://github.com/toddwhitehead
+PublisherSupportUrl: https://github.com/toddwhitehead/ptreegold/issues
+Author: Todd Whitehead
+PackageName: PTREE Gold
+PackageUrl: https://github.com/toddwhitehead/ptreegold
+License: MIT
+LicenseUrl: https://github.com/toddwhitehead/ptreegold/blob/main/LICENSE
+ShortDescription: Retro terminal password generator with cloud-ready patterns.
+Description: PTREE Gold (ptg) generates cryptographically strong passwords from named and custom patterns for cloud and on-premises services.
+Moniker: ptg
+Tags:
+  - password
+  - security
+  - terminal
+  - tui
+  - generator
+ManifestType: defaultLocale
+ManifestVersion: 1.10.0

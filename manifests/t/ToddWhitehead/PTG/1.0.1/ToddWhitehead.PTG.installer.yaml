@@ -1,0 +1,16 @@
+PackageIdentifier: ToddWhitehead.PTG
+PackageVersion: 1.0.1
+InstallerType: zip
+NestedInstallerType: portable
+InstallModes:
+  - silent
+  - silentWithProgress
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/toddwhitehead/ptreegold/releases/download/v1.0.1/ptg-v1.0.1-win-x64.zip
+    InstallerSha256: 55C4EECC480CEFE75062E7B9C0D514868368721818E9F894EAA6121EC06DFFB0
+    NestedInstallerFiles:
+      - RelativeFilePath: win-x64/ptg.exe
+        PortableCommandAlias: ptg
+ManifestType: installer
+ManifestVersion: 1.10.0
