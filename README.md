@@ -7,7 +7,7 @@
 
 ## Key features:
 
-- **Named patterns** — pre-built profiles for common Azure and Windows services (SQL Server, Entra ID, Azure SQL, MySQL, PostgreSQL, AKS, App Service, APIM, VM admins, and more)
+- **Named patterns** — pre-built profiles for common Azure, AWS, and Windows services (SQL Server, Entra ID, Azure SQL, RDS, IAM, EC2 admins, AKS, App Service, APIM, VM admins, and more)
 - **Custom patterns** — build a one-off pattern on the fly without touching any config file
 - **Entropy display** — every generated password shows its bit-strength and a label (Weak / Fair / Strong / Very Strong / Excellent)
 - **Batch generation** — generate 1–50 passwords in one shot
@@ -205,6 +205,11 @@ No recompile needed — `appsettings.json` is copied to the output directory on 
 | `azure-aks-admin` | Azure Kubernetes Service Windows node admin |
 | `azure-appsvc-deploy` | Azure App Service FTP / deployment credentials |
 | `azure-apim` | Azure API Management publisher / admin account |
+| `entraid-breakglass` | Microsoft Entra ID emergency / break-glass administrator account |
+| `aws-iam-user` | AWS IAM user console password |
+| `aws-rds-sqlserver` | Amazon RDS for SQL Server master login |
+| `aws-rds-postgres` | Amazon RDS for PostgreSQL master login |
+| `aws-ec2-windows-admin` | Amazon EC2 Windows local administrator password |
 
 ---
 
