@@ -1,0 +1,16 @@
+name: Publish to WinGet
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    runs-on: windows-latest
+    steps:
+      - name: Submit to WinGet
+        uses: vedantmgoyal9/winget-releaser@v2
+        with:
+          identifier: ToddWhitehead.PTG
+          installers-regex: 'win-x64\.zip$'
+          token: ${{ secrets.WINGET_TOKEN }}

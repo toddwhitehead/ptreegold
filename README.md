@@ -51,7 +51,19 @@ PTREE Gold borrows that same philosophy for password management:
 
 Pre-built self-contained binaries are published for every release on the [Releases page](https://github.com/toddwhitehead/ptreegold/releases). No .NET SDK required to run them.
 
-### Windows (x64)
+### Windows — WinGet (recommended)
+
+```powershell
+winget install ToddWhitehead.PTG
+```
+
+After installation, run from any terminal:
+
+```powershell
+ptg
+```
+
+### Windows (x64) — Manual
 
 1. Download `ptg-vX.Y.Z-win-x64.zip` from the [latest release](https://github.com/toddwhitehead/ptreegold/releases/latest).
 2. Extract the archive (right-click → **Extract All**, or `Expand-Archive` in PowerShell):
