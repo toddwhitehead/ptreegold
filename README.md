@@ -54,7 +54,7 @@ Pre-built self-contained binaries are published for every release on the [Releas
 ### Windows — WinGet (recommended)
 
 ```powershell
-winget install ToddWhitehead.PTG
+winget install ToddWhitehead.PTreeGold
 ```
 
 After installation, run from any terminal:

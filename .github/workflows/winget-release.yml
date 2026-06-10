@@ -11,6 +11,6 @@ jobs:
       - name: Submit to WinGet
         uses: vedantmgoyal9/winget-releaser@4ffc7888bffd451b357355dc214d43bb9f23917e # v2
         with:
-          identifier: ToddWhitehead.PTG
+          identifier: ToddWhitehead.PTreeGold
           installers-regex: 'win-x64\.zip$'
           token: ${{ secrets.WINGET_TOKEN }}
