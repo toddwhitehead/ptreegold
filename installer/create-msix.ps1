@@ -11,7 +11,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$Publisher,
 
-    [string]$PublisherDisplayName = 'Todd Whitehead',
+    [string]$PublisherDisplayName,
     [string]$ManifestTemplate = 'installer/msix/AppxManifest.xml',
     [string]$AssetsDir = 'installer/msix/Images',
     [string]$OutputDir = 'installer/Output',
@@ -67,6 +67,15 @@ $resolvedSourceDir = (Resolve-Path $SourceDir).Path
 $resolvedManifestTemplate = (Resolve-Path $ManifestTemplate).Path
 $resolvedAssetsDir = (Resolve-Path $AssetsDir).Path
 $msixVersion = Convert-ToMsixVersion -RawVersion $Version
+
+if (-not $PublisherDisplayName) {
+    if ($Publisher -match '^CN=([^,]+)') {
+        $PublisherDisplayName = $Matches[1]
+    }
+    else {
+        $PublisherDisplayName = $Publisher
+    }
+}
 $tempRoot = if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } elseif ($env:TEMP) { $env:TEMP } else { [IO.Path]::GetTempPath() }
 $stageDir = Join-Path $tempRoot 'ptg-msix-layout'
 $outputPath = Join-Path (Resolve-Path '.').Path $OutputDir
