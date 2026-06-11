@@ -20,3 +20,7 @@ packages/
 # OS
 Thumbs.db
 .DS_Store
+
+# Installer artifacts
+installer/Output/
+*.pfx

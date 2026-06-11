@@ -76,6 +76,17 @@ ptg
    .\ptg.exe
    ```
 
+### Windows Store / MSIX
+
+Release builds can also publish a `ptg-vX.Y.Z-win-x64.msix` package when these GitHub Actions settings are configured:
+
+- Repository variable `WINDOWS_STORE_IDENTITY_NAME`
+- Repository variable `WINDOWS_STORE_PUBLISHER`
+- Optional secret `MSIX_CERTIFICATE_BASE64`
+- Optional secret `MSIX_CERTIFICATE_PASSWORD`
+
+Use the package identity values assigned by Partner Center so the generated MSIX is ready for Microsoft Store submission.
+
 ### macOS (x64)
 
 1. Download `ptg-vX.Y.Z-osx-x64.tar.gz` from the [latest release](https://github.com/toddwhitehead/ptreegold/releases/latest).
