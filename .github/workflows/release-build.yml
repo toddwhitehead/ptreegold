@@ -113,13 +113,18 @@ jobs:
         run: Expand-Archive dist/ptg-${{ github.ref_name }}-win-x64.zip -DestinationPath dist/extracted
 
       - name: Restore MSIX signing certificate
-        if: vars.WINDOWS_STORE_IDENTITY_NAME != '' && vars.WINDOWS_STORE_PUBLISHER != '' && secrets.MSIX_CERTIFICATE_BASE64 != ''
+        if: vars.WINDOWS_STORE_IDENTITY_NAME != '' && vars.WINDOWS_STORE_PUBLISHER != ''
         shell: pwsh
         env:
           MSIX_CERTIFICATE_BASE64: ${{ secrets.MSIX_CERTIFICATE_BASE64 }}
         run: |
-          $certificatePath = Join-Path $env:RUNNER_TEMP 'ptg-store-signing.pfx'
-          [IO.File]::WriteAllBytes($certificatePath, [Convert]::FromBase64String($env:MSIX_CERTIFICATE_BASE64))
+          if ($env:MSIX_CERTIFICATE_BASE64) {
+            $certificatePath = Join-Path $env:RUNNER_TEMP 'ptg-store-signing.pfx'
+            [IO.File]::WriteAllBytes($certificatePath, [Convert]::FromBase64String($env:MSIX_CERTIFICATE_BASE64))
+          }
+          else {
+            Write-Host 'No MSIX signing certificate configured; continuing with an unsigned package.'
+          }
 
       - name: Build MSIX package
         if: vars.WINDOWS_STORE_IDENTITY_NAME != '' && vars.WINDOWS_STORE_PUBLISHER != ''

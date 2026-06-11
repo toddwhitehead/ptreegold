@@ -67,7 +67,8 @@ $resolvedSourceDir = (Resolve-Path $SourceDir).Path
 $resolvedManifestTemplate = (Resolve-Path $ManifestTemplate).Path
 $resolvedAssetsDir = (Resolve-Path $AssetsDir).Path
 $msixVersion = Convert-ToMsixVersion -RawVersion $Version
-$stageDir = Join-Path $env:RUNNER_TEMP 'ptg-msix-layout'
+$tempRoot = if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } elseif ($env:TEMP) { $env:TEMP } else { [IO.Path]::GetTempPath() }
+$stageDir = Join-Path $tempRoot 'ptg-msix-layout'
 $outputPath = Join-Path (Resolve-Path '.').Path $OutputDir
 $packagePath = Join-Path $outputPath ("ptg-$($Version.Trim().TrimStart('v'))-win-x64.msix")
 
