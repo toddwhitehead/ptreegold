@@ -21,8 +21,38 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-if (-not (Get-Command makeappx.exe -ErrorAction SilentlyContinue)) {
-    throw "makeappx.exe was not found on PATH. Install the Windows SDK and ensure makeappx.exe is available."
+function Find-WindowsSdkTool {
+    param([string]$ToolName)
+    $cmd = Get-Command $ToolName -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Source }
+    $programFilesX86 = ${env:ProgramFiles(x86)}
+    if (-not $programFilesX86) { $programFilesX86 = 'C:\Program Files (x86)' }
+    $sdkBinRoot = Join-Path $programFilesX86 'Windows Kits\10\bin'
+    if (Test-Path $sdkBinRoot) {
+        $arch = switch ($env:PROCESSOR_ARCHITECTURE) {
+            'AMD64' { 'x64' }
+            'ARM64' { 'arm64' }
+            'ARM'   { 'arm' }
+            'x86'   { 'x86' }
+            default { 'x64' }
+        }
+        $archFallback = $env:PROCESSOR_ARCHITECTURE.ToLower()
+        $sdkVersionDirs = Get-ChildItem $sdkBinRoot -Directory |
+            Where-Object { $_.Name -match '^\d+(\.\d+)+$' } |
+            Sort-Object { [version]$_.Name } -Descending
+        foreach ($versionDir in $sdkVersionDirs) {
+            foreach ($archCandidate in @($arch, $archFallback) | Select-Object -Unique) {
+                $toolPath = Join-Path $versionDir.FullName "$archCandidate\$ToolName"
+                if (Test-Path $toolPath) { return $toolPath }
+            }
+        }
+    }
+    return $null
+}
+
+$makeappxExe = Find-WindowsSdkTool 'makeappx.exe'
+if (-not $makeappxExe) {
+    throw "makeappx.exe was not found on PATH or in Windows SDK. Install the Windows SDK and ensure makeappx.exe is available."
 }
 
 if (-not (Test-Path $SourceDir)) {
@@ -132,7 +162,7 @@ if (Test-Path $msixPath) {
     Remove-Item $msixPath -Force
 }
 
-makeappx.exe pack /o /d $stagingPath /p $msixPath | Out-Host
+& $makeappxExe pack /o /d $stagingPath /p $msixPath | Out-Host
 if ($LASTEXITCODE -ne 0) {
     throw "MSIX packaging failed with exit code $LASTEXITCODE."
 }
@@ -143,8 +173,9 @@ if ([string]::IsNullOrWhiteSpace($CertificateBase64) -or [string]::IsNullOrWhite
     return
 }
 
-if (-not (Get-Command signtool.exe -ErrorAction SilentlyContinue)) {
-    throw "signtool.exe was not found on PATH. Install the Windows SDK and ensure signtool.exe is available."
+$signtoolExe = Find-WindowsSdkTool 'signtool.exe'
+if (-not $signtoolExe) {
+    throw "signtool.exe was not found on PATH or in Windows SDK. Install the Windows SDK and ensure signtool.exe is available."
 }
 
 $certificatePath = Join-Path ([System.IO.Path]::GetTempPath()) ("ptg-msix-signing-{0}.pfx" -f ([System.Guid]::NewGuid().ToString('N')))
@@ -166,7 +197,7 @@ try {
         $certificateStore.Close()
     }
 
-    signtool.exe sign /fd SHA256 /sha1 $importedCertificate.Thumbprint /s My $msixPath | Out-Host
+    & $signtoolExe sign /fd SHA256 /sha1 $importedCertificate.Thumbprint /s My $msixPath | Out-Host
     if ($LASTEXITCODE -ne 0) {
         throw "MSIX signing failed with exit code $LASTEXITCODE."
     }
