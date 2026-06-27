@@ -146,13 +146,13 @@ while ($versionParts.Count -lt 4) {
 $msixVersion = ($versionParts -join '.')
 
 $template = Get-Content -Path $templatePath -Raw
-$manifest = $template
-    .Replace('__IDENTITY_NAME__', $IdentityName)
-    .Replace('__PUBLISHER__', $Publisher)
-    .Replace('__VERSION__', $msixVersion)
-    .Replace('__DISPLAY_NAME__', $DisplayName)
-    .Replace('__PUBLISHER_DISPLAY_NAME__', $PublisherDisplayName)
-    .Replace('__DESCRIPTION__', $Description)
+$manifest = $template.
+    Replace('__IDENTITY_NAME__', $IdentityName).
+    Replace('__PUBLISHER__', $Publisher).
+    Replace('__VERSION__', $msixVersion).
+    Replace('__DISPLAY_NAME__', $DisplayName).
+    Replace('__PUBLISHER_DISPLAY_NAME__', $PublisherDisplayName).
+    Replace('__DESCRIPTION__', $Description)
 
 $manifestPath = Join-Path $stagingPath 'AppxManifest.xml'
 Set-Content -Path $manifestPath -Value $manifest -Encoding UTF8
