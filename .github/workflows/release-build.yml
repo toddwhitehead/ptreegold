@@ -67,7 +67,6 @@ jobs:
     permissions:
       contents: read
     env:
-      HAS_MSIX_PUBLISHING: ${{ secrets.WINDOWS_STORE_IDENTITY_NAME != '' && secrets.WINDOWS_STORE_PUBLISHER != '' && secrets.WINDOWS_STORE_CERTIFICATE_BASE64 != '' && secrets.WINDOWS_STORE_CERTIFICATE_PASSWORD != '' }}
       WINDOWS_STORE_IDENTITY_NAME: ${{ secrets.WINDOWS_STORE_IDENTITY_NAME }}
       WINDOWS_STORE_PUBLISHER: ${{ secrets.WINDOWS_STORE_PUBLISHER }}
       WINDOWS_STORE_DISPLAY_NAME: ${{ secrets.WINDOWS_STORE_DISPLAY_NAME }}
@@ -99,18 +98,19 @@ jobs:
           path: installer/Output/ptg-*-win-x64-setup.exe
 
       - name: Build signed MSIX package
-        if: env.HAS_MSIX_PUBLISHING == 'true'
         shell: pwsh
         env:
           WINDOWS_STORE_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_STORE_CERTIFICATE_BASE64 }}
           WINDOWS_STORE_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_STORE_CERTIFICATE_PASSWORD }}
         run: |
           $version = "${{ github.ref_name }}".TrimStart('v')
+          $identityName = if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_IDENTITY_NAME)) { 'ToddWhitehead.PTreeGold' } else { $env:WINDOWS_STORE_IDENTITY_NAME }
+          $publisher = if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_PUBLISHER)) { 'CN=Todd Whitehead' } else { $env:WINDOWS_STORE_PUBLISHER }
           ./installer/create-msix.ps1 `
             -Version $version `
             -SourceDir (Resolve-Path dist\extracted\win-x64) `
-            -IdentityName $env:WINDOWS_STORE_IDENTITY_NAME `
-            -Publisher $env:WINDOWS_STORE_PUBLISHER `
+            -IdentityName $identityName `
+            -Publisher $publisher `
             -OutputDir installer\Output `
             -DisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_DISPLAY_NAME)) { 'PTREE Gold' } else { $env:WINDOWS_STORE_DISPLAY_NAME }) `
             -PublisherDisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME)) { 'Todd Whitehead' } else { $env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME }) `
@@ -118,7 +118,6 @@ jobs:
             -CertificatePassword $env:WINDOWS_STORE_CERTIFICATE_PASSWORD
 
       - name: Upload MSIX artifact
-        if: env.HAS_MSIX_PUBLISHING == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ptg-win-x64-msix

@@ -110,7 +110,8 @@ ptg
 
 ## Maintainers: MSIX publishing for Microsoft Store + WinGet
 
-The release workflow can produce a signed `ptg-vX.Y.Z-win-x64.msix` and publish it to GitHub Releases/WinGet.
+The release workflow now always produces a `ptg-vX.Y.Z-win-x64.msix` artifact and uploads it to GitHub Releases.
+When signing secrets are configured, that MSIX is signed and can be published to WinGet.
 
 Configure these GitHub repository secrets before cutting a release tag:
 
@@ -122,7 +123,7 @@ Configure these GitHub repository secrets before cutting a release tag:
 - `WINDOWS_STORE_PUBLISHER_DISPLAY_NAME` (optional) — publisher display name override
 - `WINGET_TOKEN` — token used by `winget-releaser`
 
-If the required Store identity/signing secrets are missing, MSIX and WinGet publish steps are skipped.
+If signing secrets are missing, the workflow still publishes an unsigned MSIX artifact and skips WinGet publish.
 
 ---
 
