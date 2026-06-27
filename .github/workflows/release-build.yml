@@ -113,9 +113,9 @@ jobs:
               throw "WINDOWS_STORE_IDENTITY_NAME and WINDOWS_STORE_PUBLISHER must be configured as repository secrets or variables when signing certificate secrets are provided. Configure them in Settings > Secrets and variables > Actions."
             }
 
-            $identityName = 'PTreeGold.Unsigned'
-            $publisher = 'CN=Unsigned PTreeGold Build'
-            Write-Warning "Using fallback unsigned MSIX identity values: IdentityName=$identityName Publisher=$publisher"
+            $identityName = 'TWhitehead.PasswordTreeGold'
+            $publisher = 'CN=A969D4FD-73DD-4CCC-9D50-DE06393026F3'
+            Write-Warning "Using fallback MSIX identity values: IdentityName=$identityName Publisher=$publisher"
           }
 
           ./installer/create-msix.ps1 `
@@ -124,7 +124,7 @@ jobs:
             -IdentityName $identityName `
             -Publisher $publisher `
             -OutputDir installer\Output `
-            -DisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_DISPLAY_NAME)) { 'PTREE Gold' } else { $env:WINDOWS_STORE_DISPLAY_NAME }) `
+            -DisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_DISPLAY_NAME)) { 'PasswordTreeGold' } else { $env:WINDOWS_STORE_DISPLAY_NAME }) `
             -PublisherDisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME)) { 'T Whitehead' } else { $env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME }) `
             -CertificateBase64 $env:WINDOWS_STORE_CERTIFICATE_BASE64 `
             -CertificatePassword $env:WINDOWS_STORE_CERTIFICATE_PASSWORD
