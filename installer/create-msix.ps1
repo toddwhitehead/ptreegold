@@ -14,6 +14,7 @@ param(
     [string]$OutputDir = "installer/Output",
     [string]$DisplayName = "PTREE Gold",
     [string]$PublisherDisplayName = "Todd Whitehead",
+    [string]$Description = "PTREE Gold",
     [string]$CertificateBase64,
     [string]$CertificatePassword
 )
@@ -21,11 +22,15 @@ param(
 $ErrorActionPreference = 'Stop'
 
 if (-not (Get-Command makeappx.exe -ErrorAction SilentlyContinue)) {
-    throw "makeappx.exe was not found on PATH."
+    throw "makeappx.exe was not found on PATH. Install the Windows SDK and ensure makeappx.exe is available."
 }
 
 if (-not (Get-Command signtool.exe -ErrorAction SilentlyContinue)) {
-    throw "signtool.exe was not found on PATH."
+    throw "signtool.exe was not found on PATH. Install the Windows SDK and ensure signtool.exe is available."
+}
+
+if (-not (Test-Path $SourceDir)) {
+    throw "Source directory not found: $SourceDir"
 }
 
 $sourceRoot = (Resolve-Path $SourceDir).Path
@@ -121,6 +126,7 @@ $manifest = $template
     .Replace('__VERSION__', $msixVersion)
     .Replace('__DISPLAY_NAME__', $DisplayName)
     .Replace('__PUBLISHER_DISPLAY_NAME__', $PublisherDisplayName)
+    .Replace('__DESCRIPTION__', $Description)
 
 $manifestPath = Join-Path $stagingPath 'AppxManifest.xml'
 Set-Content -Path $manifestPath -Value $manifest -Encoding UTF8
@@ -131,15 +137,45 @@ if (Test-Path $msixPath) {
 }
 
 makeappx.exe pack /o /d $stagingPath /p $msixPath | Out-Host
+if ($LASTEXITCODE -ne 0) {
+    throw "MSIX packaging failed with exit code $LASTEXITCODE."
+}
 
 if ([string]::IsNullOrWhiteSpace($CertificateBase64) -or [string]::IsNullOrWhiteSpace($CertificatePassword)) {
     throw 'CertificateBase64 and CertificatePassword are required to sign the MSIX package.'
 }
 
-$certificatePath = Join-Path $outputRoot 'msix-signing.pfx'
-[System.IO.File]::WriteAllBytes($certificatePath, [System.Convert]::FromBase64String($CertificateBase64))
+$certificatePath = Join-Path ([System.IO.Path]::GetTempPath()) ("ptg-msix-signing-{0}.pfx" -f ([System.Guid]::NewGuid().ToString('N')))
+$importedCertificate = $null
 
-signtool.exe sign /fd SHA256 /f $certificatePath /p $CertificatePassword $msixPath | Out-Host
-Remove-Item -Path $certificatePath -Force
+try {
+    [System.IO.File]::WriteAllBytes($certificatePath, [System.Convert]::FromBase64String($CertificateBase64))
+
+    $certFlags = [System.Security.Cryptography.X509Certificates.X509KeyStorageFlags]::PersistKeySet
+    $importedCertificate = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2
+    $importedCertificate.Import($certificatePath, $CertificatePassword, $certFlags)
+
+    $certificateStore = New-Object System.Security.Cryptography.X509Certificates.X509Store('My', 'CurrentUser')
+    try {
+        $certificateStore.Open([System.Security.Cryptography.X509Certificates.OpenFlags]::ReadWrite)
+        $certificateStore.Add($importedCertificate)
+    }
+    finally {
+        $certificateStore.Close()
+    }
+
+    signtool.exe sign /fd SHA256 /sha1 $importedCertificate.Thumbprint /s My $msixPath | Out-Host
+    if ($LASTEXITCODE -ne 0) {
+        throw "MSIX signing failed with exit code $LASTEXITCODE."
+    }
+}
+finally {
+    if ($importedCertificate -and (Test-Path "Cert:\CurrentUser\My\$($importedCertificate.Thumbprint)")) {
+        Remove-Item -Path "Cert:\CurrentUser\My\$($importedCertificate.Thumbprint)" -Force
+    }
+    if (Test-Path $certificatePath) {
+        Remove-Item -Path $certificatePath -Force
+    }
+}
 
 Write-Host "Created signed MSIX package: $msixPath"

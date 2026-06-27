@@ -67,12 +67,11 @@ jobs:
     permissions:
       contents: read
     env:
+      HAS_MSIX_PUBLISHING: ${{ secrets.WINDOWS_STORE_IDENTITY_NAME != '' && secrets.WINDOWS_STORE_PUBLISHER != '' && secrets.WINDOWS_STORE_CERTIFICATE_BASE64 != '' && secrets.WINDOWS_STORE_CERTIFICATE_PASSWORD != '' }}
       WINDOWS_STORE_IDENTITY_NAME: ${{ secrets.WINDOWS_STORE_IDENTITY_NAME }}
       WINDOWS_STORE_PUBLISHER: ${{ secrets.WINDOWS_STORE_PUBLISHER }}
       WINDOWS_STORE_DISPLAY_NAME: ${{ secrets.WINDOWS_STORE_DISPLAY_NAME }}
       WINDOWS_STORE_PUBLISHER_DISPLAY_NAME: ${{ secrets.WINDOWS_STORE_PUBLISHER_DISPLAY_NAME }}
-      WINDOWS_STORE_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_STORE_CERTIFICATE_BASE64 }}
-      WINDOWS_STORE_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_STORE_CERTIFICATE_PASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -100,8 +99,11 @@ jobs:
           path: installer/Output/ptg-*-win-x64-setup.exe
 
       - name: Build signed MSIX package
-        if: env.WINDOWS_STORE_IDENTITY_NAME != '' && env.WINDOWS_STORE_PUBLISHER != '' && env.WINDOWS_STORE_CERTIFICATE_BASE64 != '' && env.WINDOWS_STORE_CERTIFICATE_PASSWORD != ''
+        if: env.HAS_MSIX_PUBLISHING == 'true'
         shell: pwsh
+        env:
+          WINDOWS_STORE_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_STORE_CERTIFICATE_BASE64 }}
+          WINDOWS_STORE_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_STORE_CERTIFICATE_PASSWORD }}
         run: |
           $version = "${{ github.ref_name }}".TrimStart('v')
           ./installer/create-msix.ps1 `
@@ -116,7 +118,7 @@ jobs:
             -CertificatePassword $env:WINDOWS_STORE_CERTIFICATE_PASSWORD
 
       - name: Upload MSIX artifact
-        if: env.WINDOWS_STORE_IDENTITY_NAME != '' && env.WINDOWS_STORE_PUBLISHER != '' && env.WINDOWS_STORE_CERTIFICATE_BASE64 != '' && env.WINDOWS_STORE_CERTIFICATE_PASSWORD != ''
+        if: env.HAS_MSIX_PUBLISHING == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ptg-win-x64-msix
