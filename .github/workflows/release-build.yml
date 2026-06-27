@@ -115,7 +115,7 @@ jobs:
 
             $identityName = 'TWhitehead.PasswordTreeGold'
             $publisher = 'CN=A969D4FD-73DD-4CCC-9D50-DE06393026F3'
-            Write-Warning "Using fallback unsigned MSIX identity metadata aligned to Microsoft Store profile: IdentityName=$identityName Publisher=$publisher"
+            Write-Warning "Using fallback unsigned testing MSIX package metadata with Store-registered identity values: IdentityName=$identityName Publisher=$publisher"
           }
 
           ./installer/create-msix.ps1 `
@@ -124,7 +124,7 @@ jobs:
             -IdentityName $identityName `
             -Publisher $publisher `
             -OutputDir installer\Output `
-            -DisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_DISPLAY_NAME)) { 'PasswordTreeGold' } else { $env:WINDOWS_STORE_DISPLAY_NAME }) `
+            -DisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_DISPLAY_NAME)) { 'Password Tree Gold' } else { $env:WINDOWS_STORE_DISPLAY_NAME }) `
             -PublisherDisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME)) { 'T Whitehead' } else { $env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME }) `
             -CertificateBase64 $env:WINDOWS_STORE_CERTIFICATE_BASE64 `
             -CertificatePassword $env:WINDOWS_STORE_CERTIFICATE_PASSWORD
