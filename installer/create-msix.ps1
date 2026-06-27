@@ -25,10 +25,6 @@ if (-not (Get-Command makeappx.exe -ErrorAction SilentlyContinue)) {
     throw "makeappx.exe was not found on PATH. Install the Windows SDK and ensure makeappx.exe is available."
 }
 
-if (-not (Get-Command signtool.exe -ErrorAction SilentlyContinue)) {
-    throw "signtool.exe was not found on PATH. Install the Windows SDK and ensure signtool.exe is available."
-}
-
 if (-not (Test-Path $SourceDir)) {
     throw "Source directory not found: $SourceDir"
 }
@@ -142,7 +138,13 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 if ([string]::IsNullOrWhiteSpace($CertificateBase64) -or [string]::IsNullOrWhiteSpace($CertificatePassword)) {
-    throw 'CertificateBase64 and CertificatePassword are required to sign the MSIX package.'
+    Write-Host "Created unsigned MSIX package: $msixPath"
+    Write-Warning 'CertificateBase64/CertificatePassword not provided, so package signing was skipped.'
+    return
+}
+
+if (-not (Get-Command signtool.exe -ErrorAction SilentlyContinue)) {
+    throw "signtool.exe was not found on PATH. Install the Windows SDK and ensure signtool.exe is available."
 }
 
 $certificatePath = Join-Path ([System.IO.Path]::GetTempPath()) ("ptg-msix-signing-{0}.pfx" -f ([System.Guid]::NewGuid().ToString('N')))
