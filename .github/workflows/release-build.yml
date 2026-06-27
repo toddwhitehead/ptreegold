@@ -115,7 +115,7 @@ jobs:
 
             $identityName = 'TWhitehead.PasswordTreeGold'
             $publisher = 'CN=A969D4FD-73DD-4CCC-9D50-DE06393026F3'
-            Write-Warning "Using fallback MSIX identity values: IdentityName=$identityName Publisher=$publisher"
+            Write-Warning "Using fallback Microsoft profile MSIX identity values: IdentityName=$identityName Publisher=$publisher"
           }
 
           ./installer/create-msix.ps1 `
