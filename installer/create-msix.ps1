@@ -139,7 +139,7 @@ if ($LASTEXITCODE -ne 0) {
 
 if ([string]::IsNullOrWhiteSpace($CertificateBase64) -or [string]::IsNullOrWhiteSpace($CertificatePassword)) {
     Write-Host "Created unsigned MSIX package: $msixPath"
-    Write-Host 'CertificateBase64/CertificatePassword not provided, so package signing was skipped.'
+    Write-Warning 'CertificateBase64/CertificatePassword not provided, so package signing was skipped.'
     return
 }
 

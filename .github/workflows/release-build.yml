@@ -67,8 +67,8 @@ jobs:
     permissions:
       contents: read
     env:
-      WINDOWS_STORE_IDENTITY_NAME: ${{ secrets.WINDOWS_STORE_IDENTITY_NAME }}
-      WINDOWS_STORE_PUBLISHER: ${{ secrets.WINDOWS_STORE_PUBLISHER }}
+      WINDOWS_STORE_IDENTITY_NAME: ${{ secrets.WINDOWS_STORE_IDENTITY_NAME || vars.WINDOWS_STORE_IDENTITY_NAME }}
+      WINDOWS_STORE_PUBLISHER: ${{ secrets.WINDOWS_STORE_PUBLISHER || vars.WINDOWS_STORE_PUBLISHER }}
       WINDOWS_STORE_DISPLAY_NAME: ${{ secrets.WINDOWS_STORE_DISPLAY_NAME }}
       WINDOWS_STORE_PUBLISHER_DISPLAY_NAME: ${{ secrets.WINDOWS_STORE_PUBLISHER_DISPLAY_NAME }}
     steps:
@@ -104,8 +104,20 @@ jobs:
           WINDOWS_STORE_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_STORE_CERTIFICATE_PASSWORD }}
         run: |
           $version = "${{ github.ref_name }}".TrimStart('v')
-          $identityName = if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_IDENTITY_NAME)) { 'ToddWhitehead.PTreeGold' } else { $env:WINDOWS_STORE_IDENTITY_NAME }
-          $publisher = if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_PUBLISHER)) { 'CN=Todd Whitehead' } else { $env:WINDOWS_STORE_PUBLISHER }
+          $hasSigningSecrets = -not [string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_CERTIFICATE_BASE64) -and -not [string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_CERTIFICATE_PASSWORD)
+          $identityName = $env:WINDOWS_STORE_IDENTITY_NAME
+          $publisher = $env:WINDOWS_STORE_PUBLISHER
+
+          if ([string]::IsNullOrWhiteSpace($identityName) -or [string]::IsNullOrWhiteSpace($publisher)) {
+            if ($hasSigningSecrets) {
+              throw "WINDOWS_STORE_IDENTITY_NAME and WINDOWS_STORE_PUBLISHER must be configured as repository secrets or variables when signing certificate secrets are provided. Configure them in Settings > Secrets and variables > Actions."
+            }
+
+            $identityName = 'PTreeGold.Unsigned'
+            $publisher = 'CN=Unsigned PTreeGold Build'
+            Write-Warning "Using fallback unsigned MSIX identity values: IdentityName=$identityName Publisher=$publisher"
+          }
+
           ./installer/create-msix.ps1 `
             -Version $version `
             -SourceDir (Resolve-Path dist\extracted\win-x64) `
