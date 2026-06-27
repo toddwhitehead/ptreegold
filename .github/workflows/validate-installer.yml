@@ -1,6 +1,12 @@
 name: Validate Installer Build
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "installer/**"
+      - ".github/workflows/validate-installer.yml"
   pull_request:
     paths:
       - "installer/**"
@@ -9,7 +15,54 @@ on:
   workflow_dispatch:
 
 jobs:
+  validate-manifest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate AppxManifest template
+        run: |
+          python3 - << 'EOF'
+          import xml.etree.ElementTree as ET
+          import sys
+
+          template_path = 'installer/msix/AppxManifest.xml.template'
+          with open(template_path) as f:
+              content = f.read()
+
+          # Replace template placeholders with dummy values for XML parsing
+          content = content.replace('__IDENTITY_NAME__', 'DummyApp')
+          content = content.replace('__PUBLISHER__', 'CN=Dummy')
+          content = content.replace('__VERSION__', '0.0.0.0')
+          content = content.replace('__DISPLAY_NAME__', 'Dummy App')
+          content = content.replace('__PUBLISHER_DISPLAY_NAME__', 'Dummy Publisher')
+          content = content.replace('__DESCRIPTION__', 'Dummy description')
+
+          try:
+              tree = ET.fromstring(content)
+          except ET.ParseError as e:
+              print(f'ERROR: AppxManifest.xml.template is not valid XML: {e}', file=sys.stderr)
+              sys.exit(1)
+
+          # Detect deprecated ExecutionAlias element (schema requires ExecutionAliasChoice)
+          uap3_ns = 'http://schemas.microsoft.com/appx/manifest/uap/windows10/3'
+          deprecated = tree.findall(f'.//{{{uap3_ns}}}ExecutionAlias')
+          if deprecated:
+              print(
+                  'ERROR: Found deprecated uap3:ExecutionAlias element(s). '
+                  'Use uap3:ExecutionAliasChoice instead.',
+                  file=sys.stderr
+              )
+              sys.exit(1)
+
+          print('AppxManifest.xml.template validation passed.')
+          EOF
+
   build:
+    needs: validate-manifest
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -47,7 +100,7 @@ jobs:
           path: ptg-0.0.0-win-x64.zip
 
   validate-msix:
-    needs: build
+    needs: [validate-manifest, build]
     runs-on: windows-latest
     permissions:
       contents: read
