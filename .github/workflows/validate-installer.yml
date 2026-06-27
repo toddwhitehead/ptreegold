@@ -1,0 +1,82 @@
+name: Validate Installer Build
+
+on:
+  pull_request:
+    paths:
+      - "installer/**"
+      - ".github/workflows/validate-installer.yml"
+      - "*.csproj"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore PTreeGold.csproj
+
+      - name: Publish win-x64 binary
+        run: >
+          dotnet publish PTreeGold.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          /p:PublishSingleFile=true
+          /p:IncludeNativeLibrariesForSelfExtract=true
+          --output publish/win-x64
+
+      - name: Archive win-x64 binary
+        run: |
+          cd publish
+          zip -r ../ptg-0.0.0-win-x64.zip win-x64
+
+      - name: Upload win-x64 artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ptg-win-x64-validate
+          path: ptg-0.0.0-win-x64.zip
+
+  validate-msix:
+    needs: build
+    runs-on: windows-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download win-x64 artifact
+        uses: actions/download-artifact@v4.1.3
+        with:
+          name: ptg-win-x64-validate
+          path: dist
+
+      - name: Extract win-x64 archive
+        shell: pwsh
+        run: Expand-Archive dist/ptg-0.0.0-win-x64.zip -DestinationPath dist/extracted
+
+      - name: Validate MSIX package
+        shell: pwsh
+        run: |
+          ./installer/create-msix.ps1 `
+            -Version '0.0.0' `
+            -SourceDir (Resolve-Path dist\extracted\win-x64) `
+            -IdentityName 'PTreeGold.Unsigned' `
+            -Publisher 'CN=Unsigned PTreeGold Build' `
+            -OutputDir installer\Output
+
+      - name: Upload MSIX validation artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ptg-win-x64-msix-validate
+          path: installer/Output/ptg-*-win-x64.msix
