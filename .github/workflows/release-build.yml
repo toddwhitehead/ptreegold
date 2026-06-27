@@ -125,7 +125,7 @@ jobs:
             -Publisher $publisher `
             -OutputDir installer\Output `
             -DisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_DISPLAY_NAME)) { 'PTREE Gold' } else { $env:WINDOWS_STORE_DISPLAY_NAME }) `
-            -PublisherDisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME)) { 'Todd Whitehead' } else { $env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME }) `
+            -PublisherDisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME)) { 'T Whitehead' } else { $env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME }) `
             -CertificateBase64 $env:WINDOWS_STORE_CERTIFICATE_BASE64 `
             -CertificatePassword $env:WINDOWS_STORE_CERTIFICATE_PASSWORD
 

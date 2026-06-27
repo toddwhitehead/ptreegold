@@ -13,7 +13,7 @@ param(
 
     [string]$OutputDir = "installer/Output",
     [string]$DisplayName = "PTREE Gold",
-    [string]$PublisherDisplayName = "Todd Whitehead",
+    [string]$PublisherDisplayName = "T Whitehead",
     [string]$Description = "PTREE Gold",
     [string]$CertificateBase64,
     [string]$CertificatePassword
