@@ -124,7 +124,7 @@ Configure these GitHub repository secrets before cutting a release tag:
 - `WINGET_TOKEN` — token used by `winget-releaser`
 
 `WINDOWS_STORE_IDENTITY_NAME` and `WINDOWS_STORE_PUBLISHER` can also be set as repository variables instead of secrets.
-If neither `WINDOWS_STORE_IDENTITY_NAME` nor `WINDOWS_STORE_PUBLISHER` is configured, unsigned artifact builds fall back to `PTreeGold.Unsigned` and `CN=Unsigned PTreeGold Build`.
+If neither `WINDOWS_STORE_IDENTITY_NAME` nor `WINDOWS_STORE_PUBLISHER` is configured, unsigned artifact builds fall back to `TWhitehead.PasswordTreeGold` and `CN=A969D4FD-73DD-4CCC-9D50-DE06393026F3`.
 `WINDOWS_STORE_IDENTITY_NAME` is the package identity embedded in the MSIX manifest and should be explicitly configured for official releases.
 These fallback unsigned artifacts are intended for testing only and should not be used for official distribution channels (Store/WinGet).
 Unsigned fallback artifacts may fail standard end-user installation trust checks and should not be treated as production installers.

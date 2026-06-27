@@ -124,8 +124,8 @@ jobs:
           ./installer/create-msix.ps1 `
             -Version '0.0.0' `
             -SourceDir (Resolve-Path dist\extracted\win-x64) `
-            -IdentityName 'PTreeGold.Unsigned' `
-            -Publisher 'CN=Unsigned PTreeGold Build' `
+            -IdentityName 'TWhitehead.PasswordTreeGold' `
+            -Publisher 'CN=A969D4FD-73DD-4CCC-9D50-DE06393026F3' `
             -OutputDir installer\Output
 
       - name: Upload MSIX validation artifact
