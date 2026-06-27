@@ -120,7 +120,7 @@ Configure these GitHub repository secrets before cutting a release tag:
 - `WINDOWS_STORE_CERTIFICATE_BASE64` — base64-encoded `.pfx` used to sign the MSIX
 - `WINDOWS_STORE_CERTIFICATE_PASSWORD` — password for the `.pfx`
 - `WINDOWS_STORE_DISPLAY_NAME` (optional) — app display name override
-- `WINDOWS_STORE_PUBLISHER_DISPLAY_NAME` (optional) — publisher display name override
+- `WINDOWS_STORE_PUBLISHER_DISPLAY_NAME` (optional) — publisher display name override (defaults to `T Whitehead`)
 - `WINGET_TOKEN` — token used by `winget-releaser`
 
 `WINDOWS_STORE_IDENTITY_NAME` and `WINDOWS_STORE_PUBLISHER` can also be set as repository variables instead of secrets.
