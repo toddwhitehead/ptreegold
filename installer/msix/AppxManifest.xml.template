@@ -32,7 +32,7 @@
       <Extensions>
         <uap3:Extension Category="windows.appExecutionAlias" Executable="PTG.exe" EntryPoint="Windows.FullTrustApplication">
           <uap3:AppExecutionAlias>
-            <uap3:ExecutionAlias Alias="ptg.exe" />
+            <uap3:ExecutionAliasChoice Alias="ptg.exe" />
           </uap3:AppExecutionAlias>
         </uap3:Extension>
       </Extensions>
