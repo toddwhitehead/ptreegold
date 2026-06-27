@@ -3,8 +3,9 @@
   xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
   xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
   xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
   xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
-  IgnorableNamespaces="uap uap3 rescap">
+  IgnorableNamespaces="uap uap3 desktop rescap">
   <Identity Name="__IDENTITY_NAME__" Publisher="__PUBLISHER__" Version="__VERSION__" ProcessorArchitecture="x64" />
   <Properties>
     <DisplayName>__DISPLAY_NAME__</DisplayName>
@@ -31,9 +32,9 @@
       </uap:VisualElements>
       <Extensions>
         <uap3:Extension Category="windows.appExecutionAlias" Executable="PTG.exe" EntryPoint="Windows.FullTrustApplication">
-          <uap3:AppExecutionAlias>
-            <uap3:ExecutionAliasChoice Alias="ptg.exe" />
-          </uap3:AppExecutionAlias>
+            <uap3:AppExecutionAlias>
+              <desktop:ExecutionAlias Alias="ptg.exe" />
+            </uap3:AppExecutionAlias>
         </uap3:Extension>
       </Extensions>
     </Application>
