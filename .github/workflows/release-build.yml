@@ -66,6 +66,13 @@ jobs:
     runs-on: windows-latest
     permissions:
       contents: read
+    env:
+      WINDOWS_STORE_IDENTITY_NAME: ${{ secrets.WINDOWS_STORE_IDENTITY_NAME }}
+      WINDOWS_STORE_PUBLISHER: ${{ secrets.WINDOWS_STORE_PUBLISHER }}
+      WINDOWS_STORE_DISPLAY_NAME: ${{ secrets.WINDOWS_STORE_DISPLAY_NAME }}
+      WINDOWS_STORE_PUBLISHER_DISPLAY_NAME: ${{ secrets.WINDOWS_STORE_PUBLISHER_DISPLAY_NAME }}
+      WINDOWS_STORE_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_STORE_CERTIFICATE_BASE64 }}
+      WINDOWS_STORE_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_STORE_CERTIFICATE_PASSWORD }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -92,6 +99,29 @@ jobs:
           name: ptg-win-x64-setup
           path: installer/Output/ptg-*-win-x64-setup.exe
 
+      - name: Build signed MSIX package
+        if: env.WINDOWS_STORE_IDENTITY_NAME != '' && env.WINDOWS_STORE_PUBLISHER != '' && env.WINDOWS_STORE_CERTIFICATE_BASE64 != '' && env.WINDOWS_STORE_CERTIFICATE_PASSWORD != ''
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          ./installer/create-msix.ps1 `
+            -Version $version `
+            -SourceDir (Resolve-Path dist\extracted\win-x64) `
+            -IdentityName $env:WINDOWS_STORE_IDENTITY_NAME `
+            -Publisher $env:WINDOWS_STORE_PUBLISHER `
+            -OutputDir installer\Output `
+            -DisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_DISPLAY_NAME)) { 'PTREE Gold' } else { $env:WINDOWS_STORE_DISPLAY_NAME }) `
+            -PublisherDisplayName $(if ([string]::IsNullOrWhiteSpace($env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME)) { 'Todd Whitehead' } else { $env:WINDOWS_STORE_PUBLISHER_DISPLAY_NAME }) `
+            -CertificateBase64 $env:WINDOWS_STORE_CERTIFICATE_BASE64 `
+            -CertificatePassword $env:WINDOWS_STORE_CERTIFICATE_PASSWORD
+
+      - name: Upload MSIX artifact
+        if: env.WINDOWS_STORE_IDENTITY_NAME != '' && env.WINDOWS_STORE_PUBLISHER != '' && env.WINDOWS_STORE_CERTIFICATE_BASE64 != '' && env.WINDOWS_STORE_CERTIFICATE_PASSWORD != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: ptg-win-x64-msix
+          path: installer/Output/ptg-*-win-x64.msix
+
   publish-release:
     if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
     needs: [build, build-installer]
@@ -115,7 +145,7 @@ jobs:
           files: dist/*
 
   publish-winget:
-    if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')
+    if: (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/')) && secrets.WINGET_TOKEN != '' && secrets.WINDOWS_STORE_IDENTITY_NAME != '' && secrets.WINDOWS_STORE_PUBLISHER != '' && secrets.WINDOWS_STORE_CERTIFICATE_BASE64 != '' && secrets.WINDOWS_STORE_CERTIFICATE_PASSWORD != ''
     needs: publish-release
     runs-on: windows-latest
     permissions:
@@ -125,6 +155,6 @@ jobs:
         uses: vedantmgoyal9/winget-releaser@4ffc7888bffd451b357355dc214d43bb9f23917e # v2
         with:
           identifier: ToddWhitehead.PTreeGold
-          installers-regex: 'win-x64-setup\.exe$'
+          installers-regex: 'win-x64\.msix$'
           release-tag: ${{ github.event_name == 'release' && github.event.release.tag_name || github.ref_name }}
           token: ${{ secrets.WINGET_TOKEN }}
